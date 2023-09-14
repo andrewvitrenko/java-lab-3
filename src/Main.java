@@ -7,7 +7,7 @@ public class Main {
     public static void main(String[] args) {
         StringBuilder stringBuilder = new StringBuilder(example);
 
-        String[] sentences = split(stringBuilder, "[\\.!?]\\s");
+        String[] sentences = getSentences(stringBuilder, "[\\.!?]\\s");
 
         String[] result = findWords(sentences);
 
@@ -15,10 +15,10 @@ public class Main {
     }
 
     public static String[] findWords(String[] sentences) {
-        ArrayList<String> result = new ArrayList<String>();
+        ArrayList<String> result = new ArrayList<>();
 
         String firstSentence = sentences[0];
-        String[] words = split(firstSentence, ",?\\s");
+        String[] words = getWords(firstSentence, ",?\\s");
 
         for (String word : words) {
             Object[] matches = Arrays.stream(sentences).filter(sentence -> sentence.contains(word)).toArray();
@@ -31,11 +31,11 @@ public class Main {
         return result.toArray(new String[0]);
     }
 
-    public static String[] split(StringBuilder source, String pattern) {
+    public static String[] getSentences(StringBuilder source, String pattern) {
         return source.toString().split(pattern);
     }
 
-    public static String[] split(String source, String pattern) {
+    public static String[] getWords(String source, String pattern) {
         return source.split(pattern);
     }
 }
