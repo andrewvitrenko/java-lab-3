@@ -1,7 +1,5 @@
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Main {
     static final String example = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
@@ -20,30 +18,34 @@ public class Main {
     static final String WORDS_SEPARATOR = ",?\\s+";
     static final String SENTENCE_SEPARATOR = "[.!?]\\s*";
 
-    public static void main(String[] args) throws Exception {
-        StringBuilder source = new StringBuilder(example);
+    public static void main(String[] args) {
+        try {
+            LabStringBuilder source = new LabStringBuilder(example);
 
-        ArrayList<StringBuilder> sentences = Main.split(source, Main.SENTENCE_SEPARATOR);
+            ArrayList<LabStringBuilder> sentences = source.split(Main.SENTENCE_SEPARATOR);
 
-        StringBuilder firstSentence = sentences.get(0);
-        Main.validateText(sentences);
-        Main.validateSentence(firstSentence);
+            Main.validateText(sentences);
+            LabStringBuilder firstSentence = sentences.get(0);
+            Main.validateSentence(firstSentence);
 
-        String[] result = Main.findWords(firstSentence, sentences);
+            String[] result = Main.findWords(firstSentence, sentences);
 
-        if (result.length > 0) {
-            System.out.printf("result - %s\n", Arrays.toString(result));
-        } else {
-            System.out.println("0 words found");
+            if (result.length > 0) {
+                System.out.printf("result - %s\n", Arrays.toString(result));
+            } else {
+                System.out.println("0 words found");
+            }
+        } catch (LabException e) {
+            System.out.println("Lab exception - " + e.getMessage());
         }
     }
 
-    public static String[] findWords(StringBuilder base, ArrayList<StringBuilder> sentences) {
+    public static String[] findWords(LabStringBuilder base, ArrayList<LabStringBuilder> sentences) {
         ArrayList<String> result = new ArrayList<>();
 
-        ArrayList<StringBuilder> words = Main.split(base, Main.WORDS_SEPARATOR);
+        ArrayList<LabStringBuilder> words = base.split(Main.WORDS_SEPARATOR);
 
-        for (StringBuilder word : words) {
+        for (LabStringBuilder word : words) {
             Object[] matches = sentences.stream().filter(sentence -> sentence.indexOf(word.toString()) != -1).toArray();
 
             if (matches.length == 1) {
@@ -54,38 +56,18 @@ public class Main {
         return result.toArray(new String[0]);
     }
 
-    public static void validateText(ArrayList<StringBuilder> sentences) throws Exception {
+    public static void validateText(ArrayList<LabStringBuilder> sentences) throws LabException {
         Main.checkLength(sentences, 2, "Not enough text");
     }
 
-    public static void validateSentence(StringBuilder sentence) throws Exception {
-        ArrayList<StringBuilder> words = Main.split(sentence, Main.WORDS_SEPARATOR);
+    public static void validateSentence(LabStringBuilder sentence) throws LabException {
+        ArrayList<LabStringBuilder> words = sentence.split(Main.WORDS_SEPARATOR);
         Main.checkLength(words, 1, "First sentence should contain at least 1 word");
     }
 
-    public static void checkLength(ArrayList<StringBuilder> entities, int length, String errorMessage) throws Exception {
+    public static void checkLength(ArrayList<LabStringBuilder> entities, int length, String errorMessage) throws LabException {
         if (entities.size() < length) {
-            throw new Exception(errorMessage);
+            throw new LabException(errorMessage);
         }
-    }
-
-    public static ArrayList<StringBuilder> split(StringBuilder str, String separator) {
-        ArrayList<StringBuilder> result = new ArrayList<>();
-
-        Pattern pattern = Pattern.compile(separator);
-        Matcher matcher = pattern.matcher(str);
-
-        int pos = 0;
-
-        while (matcher.find()) {
-            String sentence = str.substring(pos, matcher.start());
-            pos = matcher.end();
-            result.add(new StringBuilder(sentence));
-        }
-
-        String lastItem = str.substring(pos);
-        result.add(new StringBuilder(lastItem));
-
-        return result;
     }
 }
